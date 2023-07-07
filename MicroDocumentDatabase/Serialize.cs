@@ -12,33 +12,33 @@ namespace MicroDocumentDatabase
             Dictionary<string, Type> o = new Dictionary<string, Type>();
 
             o.Add("System.String", typeof(string));
-            o.Add("String", typeof(string));
-            o.Add("string", typeof(string));
+            //o.Add("String", typeof(string));
+            //o.Add("string", typeof(string));
             o.Add("System.Guid", typeof(Guid));
-            o.Add("guid", typeof(Guid));
-            o.Add("Guid", typeof(Guid));
+            //o.Add("guid", typeof(Guid));
+            //o.Add("Guid", typeof(Guid));
             o.Add("System.Boolean", typeof(bool));
-            o.Add("Boolean", typeof(bool));
-            o.Add("bool", typeof(bool));
+            //o.Add("Boolean", typeof(bool));
+            //o.Add("bool", typeof(bool));
             o.Add("System.Byte", typeof(Byte));
-            o.Add("Byte", typeof(Byte));
-            o.Add("byte", typeof(byte));
-            o.Add("SByte", typeof(SByte));
-            o.Add("sbyte", typeof(sbyte));
+            //o.Add("Byte", typeof(Byte));
+            //o.Add("byte", typeof(byte));
+            o.Add("System.SByte", typeof(SByte));
+            //o.Add("sbyte", typeof(sbyte));
             o.Add("System.Char", typeof(Char));
-            o.Add("Char", typeof(Char));
-            o.Add("char", typeof(char));
-            o.Add("System.Decimal", typeof(Decimal));
-            o.Add("Decimal", typeof(Decimal));
-            o.Add("decimal", typeof(decimal));
-            o.Add("System.Double", typeof(Double));
-            o.Add("Double", typeof(Double));
-            o.Add("double", typeof(double));
+            //o.Add("Char", typeof(Char));
+            //o.Add("char", typeof(char));
+            o.Add("System.Decimal", typeof(decimal));
+            //o.Add("Decimal", typeof(Decimal));
+            //o.Add("decimal", typeof(decimal));
+            o.Add("System.Double", typeof(double));
+            //o.Add("Double", typeof(Double));
+            //o.Add("double", typeof(double));
             o.Add("System.Single", typeof(Single));
-            o.Add("Single", typeof(Single));
-            o.Add("single", typeof(Single));
+            //o.Add("Single", typeof(Single));
+            //o.Add("single", typeof(Single));
             o.Add("System.Int16", typeof(Int16));
-            o.Add("Int16", typeof(Int16));
+            //o.Add("Int16", typeof(Int16));
             o.Add("int", typeof(int));
             o.Add("UInt16", typeof(UInt16));
             o.Add("IntPtr", typeof(IntPtr));
@@ -48,7 +48,7 @@ namespace MicroDocumentDatabase
             o.Add("short", typeof(Int16));
             o.Add("ushort", typeof(UInt16));
             o.Add("System.DateTime", typeof(DateTime));
-            o.Add("DateTime", typeof(DateTime));
+            //o.Add("DateTime", typeof(DateTime));
 
             return TypeDictionary = o;
         }
@@ -68,6 +68,25 @@ namespace MicroDocumentDatabase
                 sb.AppendLine(element.Serializer());
             }
             sb.AppendLine(EOF);
+            return sb.ToString();
+        }
+
+        public static string Serializer<T>(this T obj)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"<record>");
+
+            var props = obj.GetType().GetProperties();
+
+            // add values
+            foreach (var prop in props)
+            {
+                sb.AppendLine($"<{prop.Name} type='{prop.PropertyType}'>{prop.GetValue(obj, null)}</{prop.Name}>");
+            }
+
+            sb.AppendLine($"</record>");
+
             return sb.ToString();
         }
 
@@ -96,25 +115,6 @@ namespace MicroDocumentDatabase
                 InMemoryDatabase.TryAdd(x.ToString(), data);
             }
             return InMemoryDatabase;
-        }
-
-        public static string Serializer<T>(this T obj)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine($"<record>");
-
-            var props = obj.GetType().GetProperties();
-
-            // add values
-            foreach (var prop in props)
-            {
-                sb.AppendLine($"<{prop.Name} type='{prop.PropertyType}'>{prop.GetValue(obj, null)}</{prop.Name}>");
-            }
-
-            sb.AppendLine($"</record>");
-
-            return sb.ToString();
         }
 
         public static byte[] BinarySerializer<T>(this T obj) => Encoding.UTF8.GetBytes(obj.Serializer<T>());
@@ -164,15 +164,15 @@ namespace MicroDocumentDatabase
             // seperate element
             var ElementNameSplit = ElementName.Split(" ");
             // element inner type
-            var ElementStringType = FullElement[1].Value.Split(" ")[1];
+            var ElementStringType = FullElement[1].Value.Split(" ")[1].Replace("<", "").Replace(">", "");
             // element inner type 
             var ElementType = typeof(Nullable);
-
-            //if (ElementStringType != null && ElementStringType.Length > 0)
-            //{
-            //    var ActualTypeString = ElementStringType.Replace("type='","").Replace("'","");
-            //    ElementType = (Type)Convert.ChangeType(ElementType, Type.GetType(ActualTypeString));
-            //}
+            // cast to type
+            if (ElementStringType != null && ElementStringType.Length > 0)
+            {
+                var ActualTypeString = ElementStringType.GetElementType();
+                ElementType = Type.GetType(ActualTypeString);
+            }
 
             // element value of <element>
             var ElementValue = FullElement[2].Value;
@@ -187,11 +187,11 @@ namespace MicroDocumentDatabase
             // clean up the string and get the inner type string name
             if (typename.StartsWith("type"))
             {
-                typename = typename.Replace("type=", "").Replace("'", "");
+                typename = typename.Replace("type='", "").Replace("'", "");
             }
 
             if (TypeDictionary.TryGetValue(typename, out var t))
-                return t.Name;
+                return t.ToString();
             else
             {
                 //Debug.WriteLine(typename);

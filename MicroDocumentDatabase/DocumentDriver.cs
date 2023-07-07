@@ -7,6 +7,7 @@ namespace MicroDocumentDatabase
         public Dictionary<string, T> InMemoryDocuments = new Dictionary<string, T>();
 
         public void Dump() => File.WriteAllText(GetFileName(), Serialize.SerializeDatabase(InMemoryDocuments.Values.ToList()));
+        //public void Save() => File.WriteAllText(GetFileName(), Serialize.SerializeDatabase(InMemoryDocuments.Values.ToList()));
 
         public void Load() => InMemoryDocuments = Serialize.DeSerializeDatabase<T>(GetFileName());
 
@@ -43,8 +44,6 @@ namespace MicroDocumentDatabase
         public void Add(T rec) => InMemoryDocuments.Add(GetUniqueId(), rec);
 
         public void Delete(string id) => InMemoryDocuments.Remove(id);
-
-        public void Save() => Serialize.SerializeDatabase<T>(InMemoryDocuments.Values.ToList());
 
         public void Update(string id, T rec)
         {

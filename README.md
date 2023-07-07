@@ -57,6 +57,8 @@ db.Delete("b");
 <p>Any problems let me know, feel free to use this code in any way you like if u break it you buy it :D</p>
 
 
+<p>Final thoughts - maybe to help with performance ill release a binary serealiser which would be faster but harder to work with. This library is very easy to keep track of your mistakes as you can look at everything as it all in text even the datastored is in plain text.</p>
+
 
 <p>Test data for you to play around with</p>
 

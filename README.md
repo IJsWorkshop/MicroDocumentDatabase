@@ -1,7 +1,7 @@
 # MicroDocumentDatabase
 
 <p>Ever had the need for a small database no fuss nothing complicated just a simple way to store and retreive information when the computer has been reset, welcome to  MicroDocumentDatabase.</p>
-<p>This database storage system can be better discribed as a document type storage system there is no relationship querying like with a conventional databases, MySQL or MSSQL.</p>
+<p>This database storage system can be better described as a document type storage system there is no relationship querying like with a conventional databases, MySQL or MSSQL.</p>
 <p>Unlike with normal databases you dont have to setup a server to operate this service, it just sits in the local directory and is easy to create, no need to handle complicated querys.</p>
 <p>You can compare a table in a normal database as an instance in this one, it also uses the type of the class as part of the filename so you can keep multiple instances of data stored in a directory.</p>
 <p>You can use any class you like just tell the database the type when you create the instance of the database.</p>
